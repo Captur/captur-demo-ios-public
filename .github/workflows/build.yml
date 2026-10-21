@@ -1,0 +1,65 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build iOS application
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GITLAB_HOST: gitlab.captur.ai
+      GITLAB_USERNAME: captur-demo-apps-mobile-sdk-g1
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Configure GitLab authentication
+        env:
+          GITLAB_ACCESS_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${GITLAB_ACCESS_TOKEN}" ]]; then
+            echo "::error::The GITLAB_TOKEN repository secret is not configured."
+            exit 1
+          fi
+
+          umask 077
+          printf 'machine %s\nlogin %s\npassword %s\n' \
+            "${GITLAB_HOST}" \
+            "${GITLAB_USERNAME}" \
+            "${GITLAB_ACCESS_TOKEN}" > "${HOME}/.netrc"
+
+      - name: Build application
+        run: |
+          set -euo pipefail
+
+          xcodebuild \
+            -project CapturDemo.xcodeproj \
+            -scheme CapturDemo \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -disableAutomaticPackageResolution \
+            -packageAuthorizationProvider netrc \
+            PRODUCT_BUNDLE_IDENTIFIER=ai.captur.demo.ci \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Remove GitLab authentication
+        if: always()
+        run: rm -f "${HOME}/.netrc"
