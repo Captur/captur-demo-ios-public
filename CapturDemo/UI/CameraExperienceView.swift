@@ -70,7 +70,7 @@ private struct PredictionView: View {
     let prediction: CapturPrediction
 
     var body: some View {
-        if let reasonCode = prediction.decision?.reasonCode {
+        if let reasonCode = prediction.decision.reasonCode {
             Text("Reason code: " + reasonCode)
                 .font(.capturHeading(12, relativeTo: .caption))
                 .padding(.horizontal, 14)
