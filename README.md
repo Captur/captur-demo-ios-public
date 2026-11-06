@@ -12,7 +12,7 @@ A SwiftUI app showing how to use CapturSDK to check e-bike parking, e-scooter pa
 ## Getting started
 
 1. Open `CapturDemo.xcodeproj` in Xcode.
-2. Use the GitLab username and token provided by Captur when installing the package. The project is configured to use CapturSDK 1.0.0.
+2. Use the GitLab username and token provided by Captur when installing the package. The project is configured to use CapturSDK 1.1.0.
 3. Replace `<YOUR_CAPTUR_API_KEY>` in `CapturDemo/CapturDemoModel.swift` with your Captur API key.
 4. Set your development team and a unique bundle identifier under **Signing & Capabilities** for the `CapturDemo` target.
 5. Select your iPhone and run the `CapturDemo` scheme.
